@@ -1,11 +1,11 @@
-from discord import (
+from disnake import (
     Intents,
     Activity,
     ActivityType,
     Message,
 )
-from discord.ui import View, Button
-from discord.ext.commands import AutoShardedBot
+from disnake.ui import View, Button
+from disnake.ext.commands import AutoShardedBot
 from typing import List, Final, Tuple
 from random import choice
 

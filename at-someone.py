@@ -1,13 +1,14 @@
-from typing import Final
 from os import getenv
+from typing import Final
 
-from bot import AtSomeoneBot
-from dotenv import load_dotenv
 from disnake import (
-    Intents,
     Activity,
     ActivityType,
+    Intents,
 )
+from dotenv import load_dotenv
+
+from bot import AtSomeoneBot
 
 load_dotenv()
 

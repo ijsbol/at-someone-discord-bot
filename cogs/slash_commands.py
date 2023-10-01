@@ -1,5 +1,5 @@
 from disnake import ApplicationCommandInteraction
-from disnake.ext.commands import Cog, Range, Range, slash_command
+from disnake.ext.commands import Cog, Range, slash_command
 from bot import AtSomeoneBot
 
 class SlashCommands(Cog):

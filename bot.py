@@ -1,13 +1,14 @@
-from typing import Final, Tuple, List
 from random import choice
+from typing import Any, Final, List, Tuple
 
-from disnake import Message, Button
-from disnake.ui import View
+from disnake import Button, Message
 from disnake.ext.commands import AutoShardedInteractionBot
+from disnake.ui import View
+
 import cogs
 
 class AtSomeoneBot(AutoShardedInteractionBot):
-    def __init__(self, **kwargs) -> None:
+    def __init__(self, **kwargs: Any) -> None:
         self.MAXIMUM_SOMEONES_PER_MESSAGE: Final[int] = kwargs.pop(
             'MAXIMUM_SOMEONES_PER_MESSAGE', 10
         )
@@ -20,7 +21,7 @@ class AtSomeoneBot(AutoShardedInteractionBot):
     def generate_mentions_message(
         self,
         guild_member_ids: List[int],
-        number_of_mentions: int
+        number_of_mentions: int,
     ) -> Tuple[str, bool]:
         maximum_warning = (
             True if number_of_mentions >= self.MAXIMUM_SOMEONES_PER_MESSAGE
@@ -48,32 +49,34 @@ class AtSomeoneBot(AutoShardedInteractionBot):
         return formatted_mentions, maximum_warning
 
     async def on_message(self, message: Message) -> None:
-        if self.user.mentioned_in(message):
-            number_of_mentions = sum(
-                message.content.count(mention_string) for mention_string in
-                    [f"<@!{self.user.id}>", f"<@{self.user.id}>"]
-            )
-            guild_members = [
-                member.id for member in message.guild.members
-                if not member.bot
-            ]
-            mentions_message, maximum_warning = self.generate_mentions_message(
-                guild_members,
-                number_of_mentions,
-            )
+        if not self.user.mentioned_in(message):
+            return
 
-            max_mentions_reached_view = None
-            if maximum_warning:
-                max_mentions_reached_view = View()
-                max_mentions_reached_view.add_item(
-                    Button(
-                        label=f"Maximum of {self.MAXIMUM_SOMEONES_PER_MESSAGE} @someone's per message",
-                        disabled=True,
-                    )
+        number_of_mentions = sum(
+            message.content.count(mention_string) for mention_string in
+                [f"<@!{self.user.id}>", f"<@{self.user.id}>"]
+        )
+        guild_members = [
+            member.id for member in message.guild.members
+            if not member.bot
+        ]
+        mentions_message, maximum_warning = self.generate_mentions_message(
+            guild_members,
+            number_of_mentions,
+        )
+
+        max_mentions_reached_view = None
+        if maximum_warning:
+            max_mentions_reached_view = View()
+            max_mentions_reached_view.add_item(
+                Button(
+                    label=f"Maximum of {self.MAXIMUM_SOMEONES_PER_MESSAGE} @someone's per message",
+                    disabled=True,
                 )
-
-            await message.reply(
-                mention_author=False,
-                content=mentions_message,
-                view=max_mentions_reached_view,
             )
+
+        await message.reply(
+            content=mentions_message,
+            mention_author=False,
+            view=max_mentions_reached_view,
+        )
